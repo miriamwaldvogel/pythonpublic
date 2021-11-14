@@ -5,10 +5,13 @@ from pygame.locals import (
     MOUSEBUTTONDOWN,
     QUIT
 )
+
 pygame.init()
 width = 1200
 length = 900
 screen = pygame.display.set_mode((width, length))
+largefont = pygame.font.SysFont('arial', 70)
+smallfont = pygame.font.SysFont('arial', 40)
 rows = 6
 colsl = 0
 colsr = 7
@@ -21,16 +24,15 @@ red = (219, 22, 22)
 grey = (210, 212, 214)
 purple = (149, 50, 168)
 green = (78, 168, 50)
-circleobjs = []
-filledheight = [rows-1]*totcols
-running = True
-winner = False
 turn = 1
 colors = [yellow, red, purple, green]
 totturns = 4
+circleobjs = []
+filledheight = [rows-1]*totcols
+winner = False
 board = [[0 for j in range(totcols)] for i in range(rows)]
-largefont = pygame.font.SysFont('arial', 70)
-smallfont = pygame.font.SysFont('arial', 40)
+running = True
+
 def win(board, player):
     for i in range(totcols-3):
         for j in range(rows):
@@ -48,12 +50,14 @@ def win(board, player):
             for j in range(3, rows):
                 if board[j][i] == board[j-1][i+1] == board[j-2][i+2] == board[j-3][i+3] == player:
                     return(True)
+
 def nextturn(turn):
     if turn < totturns:
         turn +=1
     else:
         turn = 1
     return(turn)
+
 while running:
     screen.fill((255, 255, 255))
     circleobjs = []
@@ -62,7 +66,6 @@ while running:
     leftbound = xoffset+(sqlen*colsl)
     rightbound = xoffset+(sqlen*colsr)
     totcols = colsr-colsl
-    #draw
     for i in range(rows):
         circleobjs.append([])
         for j, k in enumerate(range(colsl, colsr)):
@@ -83,6 +86,7 @@ while running:
     screen.blit(addtxt, (leftbound-addrectlen-addmargin+1, 473))
     screen.blit(addtxt, (rightbound+addmargin+1, 473))
     screen.blit(addtxt, (width/2-(addrectlen/2)+1, yoffset-addrectlen-addmargin-27))
+    totmargin = (2*addmargin)+addrectlen
     while winner:
         wintxt = smallfont.render('Player '+str(turn)+' wins!', False, (0, 0, 0))
         resettxt = smallfont.render('Reset', False, (0, 0, 0))
@@ -124,17 +128,26 @@ while running:
                 filledheight = [rows-1]+filledheight
                 colsl -= 1
                 turn = nextturn(turn)
+                if (totcols*sqlen) > (width-2*totmargin):
+                    sqlen = int((width-2*totmargin)/totcols)
+                    holeradius = int(sqlen*0.4)
             elif addrowbtnr.collidepoint(mousepos):
                 for k, l in enumerate(board):
                     board[k] += [0]
                 filledheight += [rows-1]
                 colsr += 1
                 turn = nextturn(turn)
+                if (totcols*sqlen) > (width-2*totmargin):
+                    sqlen = int((width-2*totmargin)/totcols)
+                    holeradius = int(sqlen*0.4)
             elif addcolbtn.collidepoint(mousepos):
                 rows += 1
                 board.insert(0, [0 for i in range(totcols)])
                 filledheight = [i+1 for i in filledheight]
                 turn = nextturn(turn)
+                if (rows*sqlen) > (length-85-addmargin-addrectlen):
+                    sqlen = int((length-85-addmargin-addrectlen)/rows)
+                    holeradius = int(sqlen*0.4)
             else:
                 for i, j in enumerate(circleobjs):
                     for k, l in enumerate(j):
